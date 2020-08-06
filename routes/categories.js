@@ -5,15 +5,15 @@ const {
   categoryCreate,
   categoryList,
   fetchCategory,
+  ingredientCreate,
 } = require("../controllers/categoryControllers");
 
 // middleware
-const upload = require("../middleware/storage");
+const upload = require("../middleware/multer");
 
 const router = express.Router();
 
 router.param("categoryId", async (req, res, next, categoryId) => {
-  console.log(`The value of category's ID is ${categoryId}`);
   const category = await fetchCategory(categoryId, next);
   if (category) {
     req.category = category;
@@ -28,13 +28,14 @@ router.param("categoryId", async (req, res, next, categoryId) => {
 // Category List
 router.get("/", categoryList);
 
-// create category
-router.post("/", upload.single("image"), categoryCreate);
+// Create Category
+router.post("/", categoryCreate);
 
-// update category
-router.put("/:categoryId", upload.single("image"), categoryUpdate);
-
-//delete category
-router.delete("/:categoryId", categoryDelete);
+// Create Ingredient
+router.post(
+  "/:categoryId/ingredients",
+  upload.single("image"),
+  ingredientCreate
+);
 
 module.exports = router;
